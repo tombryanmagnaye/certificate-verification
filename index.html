@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Certificate Verification</title>
+<style>body{font-family:Arial;margin:30px}input{width:320px;padding:6px}</style>
+</head>
+<body>
+<h2>Certificate Verification</h2>
+<input id="sn" placeholder="Enter serial or scan QR"><button onclick="verify()">Verify</button>
+<p id="result"></p>
+<script>
+async function verify(){
+  let sn = document.getElementById('sn').value.trim();
+  if(!sn){document.getElementById('result').innerText='Enter serial';return;}
+  let data = await fetch('data.json').then(r=>r.json()).catch(()=>{document.getElementById('result').innerText='data.json not found';});
+  if(data && data[sn]){
+    let d = data[sn];
+    document.getElementById('result').innerHTML =
+      `<b>Status:</b> VALID<br><b>Serial:</b>${sn}<br><b>Name:</b>${d.name}<br><b>Date:</b>${d.date}<br><b>SHA256:</b>${d.hash}<br><b>Valid:</b>${d.valid}`;
+  } else {
+    document.getElementById('result').innerHTML = '<b>Status:</b> NOT FOUND';
+  }
+}
+let params = new URLSearchParams(window.location.search);
+if(params.has('sn')){ document.getElementById('sn').value = params.get('sn'); verify(); }
+</script>
+</body>
+</html>
